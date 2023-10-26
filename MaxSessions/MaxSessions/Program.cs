@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Text;
 
 namespace MaxSessions // Note: actual namespace depends on the project name.
 {
@@ -10,10 +11,26 @@ namespace MaxSessions // Note: actual namespace depends on the project name.
 
             var sw = new Stopwatch();
             sw.Start();
-            
-            var recordsByDays = new List<List<Record>>();
 
-            using(var reader = new StreamReader(@"C:\test_data_onemonth.csv"))
+            var recordsByDays = ReadDataFromFile(@"C:\test_data_onemonth.csv");
+
+            var report = CalculateSessions(recordsByDays);
+            
+            var orderedReport = report.OrderBy(rl => rl.Date).ToList();
+            
+            Console.WriteLine(BuildReport(orderedReport));
+
+            sw.Stop();
+            Console.WriteLine(sw.Elapsed);
+
+            Console.ReadKey();
+        }
+
+        private static List<List<Record>> ReadDataFromFile(string path)
+        {
+            var recordsByDays = new List<List<Record>>();
+            
+            using(var reader = new StreamReader(path))
             {
                 var headers = reader.ReadLine();
 
@@ -61,27 +78,37 @@ namespace MaxSessions // Note: actual namespace depends on the project name.
                 }
                 recordsByDays.Add(currentDayRecords);
             }
-            
-            var report = new List<(DateTime, string)>();
+
+            return recordsByDays;
+        }
+        
+        
+        private static List<ReportLine> CalculateSessions(List<List<Record>> recordsByDays)
+        {
+            var report = new List<ReportLine>();
+
             Parallel.ForEach(recordsByDays, recordsByDay =>
             {
                 var result = CalculateMaxSessionsInDay(recordsByDay);
             
-                report.Add((recordsByDay.First().StartDate.Date, $"{recordsByDay.First().StartDate.Date.ToShortDateString()} - {result}"));
+                report.Add(new ReportLine()
+                {
+                    Date = recordsByDay.First().StartDate.Date,
+                    ReportString = $"{recordsByDay.First().StartDate.Date.ToShortDateString()} - {result}"
+                });
             });
-            
-            
-            var orderedReport = report.OrderBy(t => t.Item1);
 
-            foreach (var tuple in orderedReport)
+            return report;
+        }
+        private static string BuildReport(List<ReportLine> lines)
+        {
+            var sb = new StringBuilder();
+            foreach (var line in lines)
             {
-                Console.WriteLine(tuple.Item2);
+                sb.AppendLine(line.ReportString);
             }
 
-            sw.Stop();
-            Console.WriteLine(sw.Elapsed);
-
-            Console.ReadKey();
+            return sb.ToString();
         }
 
         // подумать, как захватывать первую запись предыдущего дня.
@@ -122,5 +149,11 @@ namespace MaxSessions // Note: actual namespace depends on the project name.
         public string Operator { get; set; }
         public string State { get; set; }
         public string Duration { get; set; }
+    }
+
+    public class ReportLine
+    {
+        public DateTime Date { get; set; }
+        public string ReportString { get; set; }
     }
 }
