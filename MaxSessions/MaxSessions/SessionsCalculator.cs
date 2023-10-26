@@ -9,18 +9,17 @@ public class SessionsCalculator
         Parallel.ForEach(recordsByDays, recordsByDay =>
         {
             var result = CalculateMaxSessionsInDay(recordsByDay);
-            
+
             report.Add(new ReportLine()
             {
                 Date = recordsByDay.First().StartDate.Date,
-                ReportString = $"{recordsByDay.First().StartDate.Date.ToShortDateString()} - {result}"
+                Line = $"{recordsByDay.First().StartDate.Date.ToShortDateString()} - {result}"
             });
         });
 
         return report;
     }
-
-    // подумать, как захватывать первую запись предыдущего дня.
+    
     private int CalculateMaxSessionsInDay(List<Record> recordsFirstDay)
     {
         var maxSessions = 1;

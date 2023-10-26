@@ -7,5 +7,5 @@ public class Record
     public string Project { get; set; }
     public string Operator { get; set; }
     public string State { get; set; }
-    public string Duration { get; set; }
+    public int Duration { get; set; }
 }

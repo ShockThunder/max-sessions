@@ -20,7 +20,7 @@ public class CsvReader
                 Project = firstValues[2],
                 Operator = firstValues[3],
                 State = firstValues[4],
-                Duration = firstValues[5]
+                Duration = int.Parse(firstValues[5])
             };
 
             var currentDayRecords = new List<Record>();
@@ -39,7 +39,7 @@ public class CsvReader
                     Project = values[2],
                     Operator = values[3],
                     State = values[4],
-                    Duration = values[5]
+                    Duration = int.Parse(values[5])
                 };
 
                 if (record.StartDate.Date == currentDate)
