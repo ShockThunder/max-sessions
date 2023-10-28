@@ -10,11 +10,11 @@ public class SessionsCalculator
         Parallel.ForEach(recordsByDays, recordsByDay =>
         {
             var result = CalculateMaxSessionsInDay(recordsByDay.ToList());
-
+            var currentDate = recordsByDay.First().EndDate.Date;
             report.Add(new ReportLine()
             {
-                Date = recordsByDay.First().StartDate.Date,
-                Line = $"{recordsByDay.First().StartDate.Date.ToShortDateString()} - {result}"
+                Date = currentDate,
+                Line = $"{currentDate.ToShortDateString()} - {result}"
             });
         });
 
@@ -85,9 +85,8 @@ public class SessionsCalculator
             var currentRecord = records[i];
 
             if (currentRecord.StartDate.Date == currentDay && currentRecord.EndDate.Date == currentDay)
-            {
                 currentDayRecords.Add(currentRecord);
-            }
+            
             else if (currentRecord.StartDate.Date == currentDay && currentRecord.EndDate.Date != currentDay)
             {
                 if(earliestIntersectedRecordIndex == -1)
@@ -106,17 +105,13 @@ public class SessionsCalculator
                     earliestIntersectedRecordIndex = -1;
                 }
                 else
-                {
                     currentDayRecords.Add(currentRecord);
-                }
 
                 currentDay = currentRecord.StartDate.Date;
             }
 
-            if (i == maxIndex - 1)
-            {
+            if (i == maxIndex - 1) 
                 result.Add(currentDayRecords);
-            }
         }
 
         return result;

@@ -6,12 +6,10 @@ public class ReportGenerator
 {
     public string GenerateMaxSessionsReport(List<ReportLine> lines)
     {
-        var orderedLines = lines.OrderBy(rl => rl.Date);
+        lines.Sort((a,b) => a.Date.CompareTo(b.Date));
         var sb = new StringBuilder();
-        foreach (var line in orderedLines)
-        {
+        foreach (var line in lines) 
             sb.AppendLine(line.Line);
-        }
 
         return sb.ToString();
     }
