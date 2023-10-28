@@ -16,22 +16,36 @@ public class ReportGenerator
         return sb.ToString();
     }
 
-    public string GenerateStatesTimeReport(List<List<Record>> records)
+    public string GenerateStatesTimeReport(List<Record> records)
     {
-        var recordsForMonth = records.SelectMany(x => x).ToList();
-        var groupedByOperator = recordsForMonth.GroupBy(x => x.Operator);
+        records.Sort((a,b) => String.Compare(a.Operator, b.Operator, StringComparison.Ordinal));
+        
+        var currentOperator = records[0].Operator;
+        var currentOperatorStates = new Dictionary<string, int>();
         var sb = new StringBuilder();
-        foreach (var group in groupedByOperator)
+        
+        for (int i = 0; i < records.Count; i++)
         {
-            var operatorName = group.Key;
-            var groupedByStates = group.GroupBy(x => x.State);
-            var reportLine = operatorName;
-            foreach (var groupedByState in groupedByStates)
+            var currentRecord = records[i];
+            if (currentRecord.Operator == currentOperator)
             {
-                reportLine += $" {groupedByState.Key} - {groupedByState.Sum(x => x.Duration)}";
+                if (currentOperatorStates.ContainsKey(currentRecord.State))
+                    currentOperatorStates[currentRecord.State] += currentRecord.Duration;
+                else
+                    currentOperatorStates[currentRecord.State] = currentRecord.Duration;
             }
+            else
+            {
+                var reportLine = currentOperator;
+                foreach (var operatorState in currentOperatorStates)
+                    reportLine += $" {operatorState.Key} - {operatorState.Value}";
 
-            sb.AppendLine(reportLine);
+                sb.AppendLine(reportLine);
+                
+                currentOperator = currentRecord.Operator;
+                currentOperatorStates = new Dictionary<string, int>();
+                currentOperatorStates[currentRecord.State] = currentRecord.Duration;
+            }
         }
 
         return sb.ToString();

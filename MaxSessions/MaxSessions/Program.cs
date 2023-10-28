@@ -19,7 +19,7 @@
             var reportGenerator = new ReportGenerator();
             Console.WriteLine(reportGenerator.GenerateMaxSessionsReport(sessions));
             Console.WriteLine("---------------------------------");
-            //Console.WriteLine(reportGenerator.GenerateStatesTimeReport(recordsByDays));
+            Console.WriteLine(reportGenerator.GenerateStatesTimeReport(recordsByDays));
             
             Console.ReadKey();
         }
