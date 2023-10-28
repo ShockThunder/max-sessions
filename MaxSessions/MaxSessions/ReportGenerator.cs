@@ -21,6 +21,7 @@ public class ReportGenerator
         var currentOperator = records[0].Operator;
         var currentOperatorStates = new Dictionary<string, int>();
         var sb = new StringBuilder();
+        string reportLine;
         
         for (int i = 0; i < records.Count; i++)
         {
@@ -34,7 +35,7 @@ public class ReportGenerator
             }
             else
             {
-                var reportLine = currentOperator;
+                reportLine = currentOperator;
                 foreach (var operatorState in currentOperatorStates)
                     reportLine += $" {operatorState.Key} - {operatorState.Value}";
 
@@ -45,6 +46,13 @@ public class ReportGenerator
                 currentOperatorStates[currentRecord.State] = currentRecord.Duration;
             }
         }
+        
+        //fill last operator
+        reportLine = currentOperator;
+        foreach (var operatorState in currentOperatorStates)
+            reportLine += $" {operatorState.Key} - {operatorState.Value}";
+
+        sb.AppendLine(reportLine);
 
         return sb.ToString();
     }

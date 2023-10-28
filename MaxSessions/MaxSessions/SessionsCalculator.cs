@@ -84,6 +84,10 @@ public class SessionsCalculator
         {
             var currentRecord = records[i];
 
+            //skip yesterday's sessions in case if midnight intersection was too long
+            if(currentRecord.StartDate.Date < currentDay && currentRecord.EndDate.Date < currentDay.Date)
+                continue;
+            
             if (currentRecord.StartDate.Date == currentDay && currentRecord.EndDate.Date == currentDay)
                 currentDayRecords.Add(currentRecord);
             
@@ -109,10 +113,8 @@ public class SessionsCalculator
 
                 currentDay = currentRecord.StartDate.Date;
             }
-
-            if (i == maxIndex - 1) 
-                result.Add(currentDayRecords);
         }
+        result.Add(currentDayRecords);
 
         return result;
     }
