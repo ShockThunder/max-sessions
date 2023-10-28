@@ -4,7 +4,6 @@ public class CsvReader
 {
     public List<Record> ReadSessionsDataFromFile(string path)
     {
-        var recordsByDays = new List<List<Record>>();
         var records = new List<Record>();
 
         using (var reader = new StreamReader(path))
@@ -30,6 +29,9 @@ public class CsvReader
                 records.Add(record);
             }
         }
-        return records.OrderBy(x => x.StartDate).ToList();
+        
+        records.Sort((a, b) => a.StartDate.CompareTo(b.StartDate));
+
+        return records;
     }
 }

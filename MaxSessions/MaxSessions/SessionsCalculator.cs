@@ -5,7 +5,7 @@ public class SessionsCalculator
     public List<ReportLine> CalculateSessions(List<Record> records)
     {
         var report = new List<ReportLine>();
-        var recordsByDays = records.GroupBy(x => x.DayOfSession);
+        var recordsByDays = GroupByDays(records);
 
         Parallel.ForEach(recordsByDays, recordsByDay =>
         {
@@ -67,5 +67,58 @@ public class SessionsCalculator
             return true;
 
         return false;
+    }
+
+    private List<List<Record>> GroupByDays(List<Record> records)
+    {
+        var result = new List<List<Record>>();
+
+        //parameter to handle possible midnight intersections
+        var earliestIntersectedRecordIndex = -1;
+        
+        var currentDay = records[0].StartDate.Date;
+        var currentDayRecords = new List<Record>();
+        var maxIndex = records.Count;
+
+        for (int i = 0; i < maxIndex; i++)
+        {
+            var currentRecord = records[i];
+
+            if (currentRecord.StartDate.Date == currentDay && currentRecord.EndDate.Date == currentDay)
+            {
+                currentDayRecords.Add(currentRecord);
+            }
+            else if (currentRecord.StartDate.Date == currentDay && currentRecord.EndDate.Date != currentDay)
+            {
+                if(earliestIntersectedRecordIndex == -1)
+                    earliestIntersectedRecordIndex = i;
+                
+                currentDayRecords.Add(currentRecord);
+            }
+            else
+            {
+                result.Add(currentDayRecords);
+                currentDayRecords = new List<Record>();
+                
+                if (earliestIntersectedRecordIndex != -1)
+                {
+                    i = earliestIntersectedRecordIndex;
+                    earliestIntersectedRecordIndex = -1;
+                }
+                else
+                {
+                    currentDayRecords.Add(currentRecord);
+                }
+
+                currentDay = currentRecord.StartDate.Date;
+            }
+
+            if (i == maxIndex - 1)
+            {
+                result.Add(currentDayRecords);
+            }
+        }
+
+        return result;
     }
 }
