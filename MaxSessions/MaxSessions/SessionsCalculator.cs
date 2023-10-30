@@ -159,8 +159,16 @@ public class SessionsCalculator
             });
         }
         
-        result.Sort((a,b) => a.Date.CompareTo(b.Date));
+        result.Sort(ComparePoints);
 
         return result;
+    }
+
+    private int ComparePoints(RecordPoint a, RecordPoint b)
+    {
+        if (a.Date == b.Date)
+            return a.Type.CompareTo(b.Type);
+        
+        return a.Date.CompareTo(b.Date);
     }
 }
