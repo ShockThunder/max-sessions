@@ -57,13 +57,13 @@ public class SessionsCalculator
 
     private bool IsIntersect(DateTime startBoundary, DateTime endBoundary, Record checkedRecord)
     {
-        if (checkedRecord.StartDate < startBoundary && checkedRecord.EndDate > endBoundary)
+        if (checkedRecord.StartDate <= startBoundary && checkedRecord.EndDate >= endBoundary)
             return true;
-        if (checkedRecord.StartDate < startBoundary && checkedRecord.EndDate > startBoundary)
+        if (checkedRecord.StartDate <= startBoundary && checkedRecord.EndDate >= startBoundary)
             return true;
-        if (checkedRecord.StartDate < endBoundary && checkedRecord.EndDate > endBoundary)
+        if (checkedRecord.StartDate <= endBoundary && checkedRecord.EndDate >= endBoundary)
             return true;
-        if (checkedRecord.StartDate > startBoundary && checkedRecord.EndDate < endBoundary)
+        if (checkedRecord.StartDate >= startBoundary && checkedRecord.EndDate <= endBoundary)
             return true;
 
         return false;
