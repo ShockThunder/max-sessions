@@ -9,7 +9,7 @@ public class SessionsCalculator
 
         Parallel.ForEach(recordsByDays, recordsByDay =>
         {
-            var result = CalculateMaxSessionsInDay(recordsByDay.ToList());
+            var result = CalculateMaxSessionsInDayByScanLine(recordsByDay.ToList());
             var currentDate = recordsByDay.First().EndDate.Date;
             report.Add(new ReportLine()
             {
@@ -47,6 +47,28 @@ public class SessionsCalculator
                 if (newRec.EndDate < endTimeBoundary)
                     endTimeBoundary = newRec.EndDate;
             }
+
+            if (curMax > maxSessions)
+                maxSessions = curMax;
+        }
+
+        return maxSessions;
+    }
+
+    private int CalculateMaxSessionsInDayByScanLine(List<Record> recordsFirstDay)
+    {
+        var maxSessions = 1;
+
+        var points = SplitByPoints(recordsFirstDay);
+        var maxIndex = points.Count();
+
+        var curMax = 0;
+        for (int i = 0; i < maxIndex; i++)
+        {
+            if (points[i].Type == PointType.Start)
+                curMax++;
+            if (points[i].Type == PointType.End)
+                curMax--;
 
             if (curMax > maxSessions)
                 maxSessions = curMax;
@@ -115,6 +137,29 @@ public class SessionsCalculator
             }
         }
         result.Add(currentDayRecords);
+
+        return result;
+    }
+
+    private List<RecordPoint> SplitByPoints(List<Record> records)
+    {
+        var result = new List<RecordPoint>();
+        foreach (var record in records)
+        {
+            result.Add(new RecordPoint()
+            {
+                Date = record.StartDate,
+                Type = PointType.Start
+            });
+            
+            result.Add(new RecordPoint()
+            {
+                Date = record.EndDate,
+                Type = PointType.End
+            });
+        }
+        
+        result.Sort((a,b) => a.Date.CompareTo(b.Date));
 
         return result;
     }
